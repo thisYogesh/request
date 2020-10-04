@@ -76,7 +76,7 @@ const request = {
     port: function(port){
         server.listen(port, function(error){
             if(!error){
-                console.log('Request server is created at http://localhost:' + port)
+                console.log('Requester is running at http://localhost:' + port)
             }else{
                 console.log('Error in creating Request server!', error)
             }
@@ -99,8 +99,27 @@ const request = {
         const url = req.url
         const method = req.method.toLowerCase()
         const route = methods.matchRoute(url, method)
-        if(route) route.callback(req, res, route.params)
-        else methods.unhandled(req, res)
+
+        if(route){
+            if(method !== 'get'){
+                let payload = ''
+                req.on('data', function(data){
+                    payload += data
+                })
+
+                req.on('end', function(){
+                    payload = payload.toString()
+                    route.callback(req, res, {
+                        params: route.params,
+                        payload
+                    })
+                })
+            }else{
+                route.callback(req, res, {
+                    params: route.params
+                })
+            }
+        } else methods.unhandled(req, res)
     },
 }
 
