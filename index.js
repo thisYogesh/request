@@ -1,5 +1,6 @@
 const http = require('http')
-const routes = {get: {}, post: {}}
+const assets = require('./js/assets')
+const routes = { get: {}, post: {} }
 const server = http.createServer(function(req, res) {
     request.invokeMethod(req, res)
 })
@@ -8,7 +9,9 @@ const methods = {
     unhandled: function(req, res){
         const url = req.url
         const method = req.method.toLowerCase()
-        res.end(`cannot ${method} ${url}`)
+
+        if(method === 'get') assets.serve(req, res)
+        else res.writeHead(404).end(`cannot ${method} ${url}`)
     },
 
     setParams: function(path, routeObject){
@@ -74,6 +77,7 @@ const methods = {
 
 const request = {
     port: function(port){
+        
         server.listen(port, function(error){
             if(!error){
                 console.log('Requester is running at http://localhost:' + port)
@@ -81,6 +85,10 @@ const request = {
                 console.log('Error in creating Request server!', error)
             }
         })
+    },
+
+    serve: function(rooturl){
+        assets.init(rooturl)
     },
 
     get: function(route, callback){
@@ -119,7 +127,7 @@ const request = {
                     params: route.params
                 })
             }
-        } else methods.unhandled(req, res)
+        } else methods.unhandled(req, res);
     },
 }
 
