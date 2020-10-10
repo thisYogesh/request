@@ -34,7 +34,7 @@ module.exports = {
             res.writeHead(404, {
                 'Content-Type': mime.default
             })
-            res.end(`cannot ${method} ${path}`)
+            res.end(`cannot ${method} ${pathname}`)
         }
 
     }
